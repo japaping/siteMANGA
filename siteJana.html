@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LISTINHA DE MANGA UwU</title>
+  <link rel="stylesheet" href="siteJana.css">
+</head>
+<body>
+<header>
+  <h1>MEUS MANGÁS UwU</h1>
+  <h2>Adicione os mangás que você já leu e seus respectivos números de capítulos abaixo:</h2>
+  <h3>FEITO COM MUITO AMOR PELO SEU NAMORADO &lt;3 </h3>
+</header>
+<form>
+  <label for="livro">Título do livro:</label>
+  <input type="text" id="livro" name="livro" class = "nomes"><br>
+
+  <label for="capitulos">Números de capítulos lidos:</label>
+  <input type="number" id="capitulos" name="capitulos" class="capt">
+
+  <input type="submit" value="Adicionar livro">
+</form>
+<table>
+  <thead>
+    <tr>
+      <th>Título do livro</th>
+      <th>Capítulos lidos</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td id = "1">Exemplo de livro</td>
+      <td>10</td>
+    </tr>
+    <!-- Adicione mais linhas aqui para cada livro adicionado -->
+  </tbody>
+</table>
+
+</body>
+<script>
+    const form = document.querySelector('form');
+    const table = document.querySelector('table tbody');
+  
+    // Carrega os dados do armazenamento local quando a página é carregada
+    const dadosSalvos = JSON.parse(localStorage.getItem('livros')) || [];
+    for (let i = 0; i < dadosSalvos.length; i++) {
+      const { livro, capitulos } = dadosSalvos[i];
+      adicionarLivro(livro, capitulos);
+    }
+  
+    form.addEventListener('submit', event => {
+      event.preventDefault();
+  
+      const livro = document.getElementById('livro').value;
+      const capitulos = document.getElementById('capitulos').value;
+  
+      // Verifica se o livro já foi adicionado
+      const livroRepetido = verificarLivroRepetido(livro);
+  
+      // Adiciona uma nova linha se o livro não for repetido
+      if (!livroRepetido) {
+        adicionarLivro(livro, capitulos);
+        salvarDados();
+        form.reset();
+      } else {
+        alert('Livro já adicionado à lista.');
+      }
+    });
+  
+    function verificarLivroRepetido(livro) {
+      const linhas = table.querySelectorAll('tr');
+      for (let i = 0; i < linhas.length; i++) {
+        const linha = linhas[i];
+        const titulo = linha.cells[0].textContent;
+        if (titulo === livro) {
+          return true;
+        }
+      }
+      return false;
+    }
+  
+    function adicionarLivro(livro, capitulos) {
+      const row = table.insertRow();
+      const index = table.rows.length; // Usa o índice da última linha como o ID
+      row.id = index;
+      const cell1 = row.insertCell();
+      const cell2 = row.insertCell();
+      const cell3 = row.insertCell();
+  
+      cell1.innerHTML = livro;
+      cell2.innerHTML = capitulos;
+      cell3.innerHTML = '<button class="remover-livro">Remover</button>';
+  
+      // Adiciona um evento de clique ao botão de remover
+      const btnRemover = cell3.querySelector('.remover-livro');
+      btnRemover.addEventListener('click', () => {
+        removerLivro(index);
+        salvarDados();
+      });
+    }
+  
+    function removerLivro(index) {
+      const row = document.getElementById(index);
+      row.parentNode.removeChild(row);
+    }
+  
+    function salvarDados() {
+      const linhas = table.querySelectorAll('tr');
+      const dados = [];
+      for (let i = 0; i < linhas.length; i++) {
+        const linha = linhas[i];
+        const livro = linha.cells[0].textContent;
+        const capitulos = linha.cells[1].textContent;
+        dados.push({ livro, capitulos });
+      }
+      localStorage.setItem('livros', JSON.stringify(dados));
+    }
+  </script>
+  
+  
+
+</html>
